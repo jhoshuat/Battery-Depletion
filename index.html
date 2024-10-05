@@ -77,7 +77,9 @@
             <button type="button" onclick="calculateDepletion()">Calculate Depletion</button>
         </form>
         <div id="result" class="result"></div>
-        <button type="button" class="copy-button" onclick="copyResults()">Copy Results</button>
+        
+        <textarea id="copyBox" rows="6" style="width: 100%; margin-top: 10px;" readonly></textarea>
+        $1
     </div>
 
     <script>
@@ -110,16 +112,7 @@
         }
 
         function copyResults() {
-            const startCharge = document.getElementById("startCharge").value;
-            const startPercent = document.getElementById("startPercent").value;
-            const endCharge = document.getElementById("endCharge").value;
-            const endPercent = document.getElementById("endPercent").value;
-            const depletionText = document.getElementById("result").innerText;
-
-            const resultText = `Battery Charge End – ${endCharge}\nBattery Charge End % – ${endPercent}%\n` +
-                               `Battery Charge Start – ${startCharge}\nBattery Charge Start % – ${startPercent}%\n` +
-                               `${depletionText}`;
-
+            $1document.getElementById("copyBox").value = resultText;
             navigator.clipboard.writeText(resultText).then(() => {
                 alert("Results copied to clipboard!");
             }).catch(err => {
