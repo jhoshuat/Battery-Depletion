@@ -78,9 +78,7 @@
         </form>
         <div id="result" class="result"></div>
         
-        <textarea id="copyBox" rows="6" style="width: 100%; margin-top: 10px;" readonly></textarea>
-        
-    </div>
+        </div>
 
     <script>
         function setStartChargeToNow() {
@@ -112,10 +110,26 @@
         }
 
         function copyResults() {
-            $1document.getElementById("copyBox").value = resultText;
+            const startCharge = document.getElementById("startCharge").value;
+            const startPercent = document.getElementById("startPercent").value;
+            const endCharge = document.getElementById("endCharge").value;
+            const endPercent = document.getElementById("endPercent").value;
+            const depletionText = document.getElementById("result").innerText;
+
+            const resultText = `Battery Charge End – ${endCharge.replace('T', ' - ')}
+Battery Charge End % – ${endPercent}%
+` +
+                               `Battery Charge Start – ${startCharge.replace('T', ' - ')}
+Battery Charge Start % – ${startPercent}%
+` +
+                               `${depletionText}`;
+
             navigator.clipboard.writeText(resultText).then(() => {
                 alert("Results copied to clipboard!");
             }).catch(err => {
+                alert("Failed to copy: " + err);
+            });
+        }).catch(err => {
                 alert("Failed to copy: " + err);
             });
         }
