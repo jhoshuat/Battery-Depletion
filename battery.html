@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battery Depletion Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .form-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        input[type="number"], input[type="datetime-local"] {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 15px;
+            font-size: 1.2em;
+        }
+        .copy-button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .copy-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h3>Battery Depletion Form</h3>
+        <form id="batteryForm">
+            <label for="endCharge">Battery Charge End (Date & Time):</label>
+            <input type="datetime-local" id="endCharge" required>
+            
+            <label for="endPercent">Battery Charge End (%):</label>
+            <input type="number" id="endPercent" min="0" max="100" required>
+
+            <label for="startCharge">Battery Charge Start (Date & Time):</label>
+            <input type="datetime-local" id="startCharge" required>
+            <button type="button" onclick="setStartChargeToNow()">Set to Now</button>
+
+            <label for="startPercent">Battery Charge Start (%):</label>
+            <input type="number" id="startPercent" min="0" max="100" required>
+
+            <button type="button" onclick="calculateDepletion()">Calculate Depletion</button>
+        </form>
+        <div id="result" class="result"></div>
+        <button type="button" class="copy-button" onclick="copyResults()">Copy Results</button>
+    </div>
+
+    <script>
+        function setStartChargeToNow() {
+            const now = new Date();
+            const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            document.getElementById("startCharge").value = localNow;
+        }
+
+        function calculateDepletion() {
+            const startCharge = document.getElementById("startCharge").value;
+            const startPercent = parseFloat(document.getElementById("startPercent").value);
+            const endCharge = document.getElementById("endCharge").value;
+            const endPercent = parseFloat(document.getElementById("endPercent").value);
+
+            if (!startCharge || isNaN(startPercent) || !endCharge || isNaN(endPercent)) {
+                document.getElementById("result").innerText = "Please fill in all fields correctly.";
+                return;
+            }
+
+            const startTime = new Date(startCharge).getTime();
+            const endTime = new Date(endCharge).getTime();
+
+            const timeDifferenceHours = Math.abs(endTime - startTime) / (1000 * 60 * 60);
+            const timeFractionOfDay = 24 / timeDifferenceHours;
+            const percentageDifference = endPercent - startPercent;
+            const depletion = timeFractionOfDay * percentageDifference;
+
+            document.getElementById("result").innerText = `Estimated % battery depletion per day: ${depletion.toFixed(2)}%`;
+        }
+
+        function copyResults() {
+            const startCharge = document.getElementById("startCharge").value;
+            const startPercent = document.getElementById("startPercent").value;
+            const endCharge = document.getElementById("endCharge").value;
+            const endPercent = document.getElementById("endPercent").value;
+            const depletionText = document.getElementById("result").innerText;
+
+            const resultText = `Battery Charge End – ${endCharge}\nBattery Charge End % – ${endPercent}%\n` +
+                               `Battery Charge Start – ${startCharge}\nBattery Charge Start % – ${startPercent}%\n` +
+                               `${depletionText}`;
+
+            navigator.clipboard.writeText(resultText).then(() => {
+                alert("Results copied to clipboard!");
+            }).catch(err => {
+                alert("Failed to copy: " + err);
+            });
+        }
+    </script>
+</body>
+</html>
