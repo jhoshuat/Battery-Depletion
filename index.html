@@ -77,13 +77,13 @@
             <button type="button" onclick="calculateDepletion()">Calculate Depletion</button>
         </form>
         <div id="result" class="result"></div>
-        
-        </div>
+        <button type="button" class="copy-button" onclick="copyResults()">Copy Results</button>
+    </div>
 
     <script>
         function setStartChargeToNow() {
             const now = new Date();
-            const localNow = new Date().toISOString().substring(0, 16);
+            const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
             document.getElementById("startCharge").value = localNow;
         }
 
@@ -116,20 +116,13 @@
             const endPercent = document.getElementById("endPercent").value;
             const depletionText = document.getElementById("result").innerText;
 
-            const resultText = `Battery Charge End – ${endCharge.replace('T', ' - ')}
-Battery Charge End % – ${endPercent}%
-` +
-                               `Battery Charge Start – ${startCharge.replace('T', ' - ')}
-Battery Charge Start % – ${startPercent}%
-` +
+            const resultText = `Battery Charge End – ${endCharge}\nBattery Charge End % – ${endPercent}%\n` +
+                               `Battery Charge Start – ${startCharge}\nBattery Charge Start % – ${startPercent}%\n` +
                                `${depletionText}`;
 
             navigator.clipboard.writeText(resultText).then(() => {
                 alert("Results copied to clipboard!");
             }).catch(err => {
-                alert("Failed to copy: " + err);
-            });
-        }).catch(err => {
                 alert("Failed to copy: " + err);
             });
         }
