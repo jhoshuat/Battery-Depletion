@@ -8,8 +8,9 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             background-color: #f0f0f0;
         }
@@ -19,6 +20,7 @@
             border-radius: 8px;
             box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
             width: 300px;
+            text-align: center;
         }
         input[type="number"], input[type="datetime-local"] {
             width: 100%;
@@ -30,36 +32,43 @@
         button {
             width: 100%;
             padding: 10px;
-            background-color: #007bff;
-            color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            margin-top: 10px;
+            color: white;
         }
         button:hover {
-            background-color: #0056b3;
+            opacity: 0.9;
         }
-        .result {
-            margin-top: 15px;
-            font-size: 1.2em;
+        .calculate-button {
+            background-color: #007bff;
         }
         .copy-button {
-            margin-top: 10px;
-            padding: 10px;
             background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
         }
-        .copy-button:hover {
-            background-color: #218838;
+        .preset-button {
+            background-color: #ffc107;
+        }
+        .notification {
+            display: none;
+            padding: 10px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+            width: 100%;
         }
     </style>
 </head>
 <body>
+
+    <div id="notification" class="notification"></div>
+
     <div class="form-container">
-        <h3>Battery Depletion Form</h3>
+        <h3>Battery Depletion Calculator</h3>
         <form id="batteryForm">
             <label for="endCharge">Battery Charge End (Date & Time):</label>
             <input type="datetime-local" id="endCharge" required>
@@ -74,10 +83,12 @@
             <label for="startPercent">Battery Charge Start (%):</label>
             <input type="number" id="startPercent" min="0" max="100" required>
 
-            <button type="button" onclick="calculateDepletion()">Calculate Depletion</button>
+            <button type="button" class="calculate-button" onclick="calculateDepletion()">Calculate Depletion</button>
         </form>
         <div id="result" class="result"></div>
+        
         <button type="button" class="copy-button" onclick="copyResults()">Copy Results</button>
+        <button type="button" class="preset-button" onclick="copyPresetMessage()">Copy No Logs Message</button>
     </div>
 
     <script>
@@ -116,16 +127,43 @@
             const endPercent = document.getElementById("endPercent").value;
             const depletionText = document.getElementById("result").innerText;
 
-            const resultText = `Battery Charge End – ${endCharge}\nBattery Charge End % – ${endPercent}%\n` +
-                               `Battery Charge Start – ${startCharge}\nBattery Charge Start % – ${startPercent}%\n` +
+            const endChargeFormatted = new Date(endCharge).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', year: 'numeric', month: 'numeric', day: 'numeric', hour12: true });
+            const startChargeFormatted = new Date(startCharge).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', year: 'numeric', month: 'numeric', day: 'numeric', hour12: true });
+            const resultText = `Battery Charge End – ${endChargeFormatted}
+` +
+			       `IBC – ${endPercent}
+` +
+                               `Battery Charge Start – ${startChargeFormatted}
+` +
+			       `IBC – ${startPercent}
+` +
                                `${depletionText}`;
-
             navigator.clipboard.writeText(resultText).then(() => {
-                alert("Results copied to clipboard!");
+                showNotification("Intake copied to clipboard!");
             }).catch(err => {
                 alert("Failed to copy: " + err);
             });
         }
+
+        function copyPresetMessage() {
+            const text = "Logs not uploaded, CTS task team will check again in 24 hours to see if calculation can be completed";
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification("No Logs message copied to clipboard!");
+            }).catch(err => {
+                alert("Failed to copy: " + err);
+            });
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById("notification");
+            notification.innerText = message;
+            notification.style.display = "block";
+
+            setTimeout(() => {
+                notification.style.display = "none";
+            }, 3000);
+        }
     </script>
+
 </body>
 </html>
